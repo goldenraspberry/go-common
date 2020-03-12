@@ -1,13 +1,14 @@
-package webservice
+package server
 
 import (
 	"context"
-	"github.com/goldenraspberry/go-common/config"
-	"github.com/goldenraspberry/go-common/utils"
 	"log"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/goldenraspberry/go-common/config"
+	"github.com/goldenraspberry/go-common/utils"
 )
 
 func RunEngine(handler http.Handler) {
@@ -30,7 +31,7 @@ func RunEngine(handler http.Handler) {
 				defer cancel()
 				log.Println("Shutdown Server ...")
 				if err := oldServer.Shutdown(ctx); err != nil {
-					log.Fatalf("Server Shutdown:", err)
+					log.Fatalf("Server Shutdown: %v\n", err)
 				}
 				log.Println("Server exiting")
 			})
