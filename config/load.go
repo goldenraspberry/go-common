@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 
@@ -24,7 +25,7 @@ func loadConfigFile(baseDir string, file string) *goconfig.ConfigFile {
 		panic(err)
 	}
 
-	if err = loadIncludeFiles(baseDir, goConfig); err != nil {
+	if err = loadIncludeFiles(configFilePath, goConfig); err != nil {
 		panic("load include files error:" + err.Error())
 	}
 
@@ -36,11 +37,10 @@ func loadConfigFile(baseDir string, file string) *goconfig.ConfigFile {
 			sig := <-ch
 			switch sig {
 			case syscall.SIGUSR1:
-				newGoConfig := reloadConfigFile(baseDir, configFilePath)
+				newGoConfig := reloadConfigFile(configFilePath)
 				if newGoConfig != nil {
 					lock.Lock()
-					goConfig = newGoConfig
-					loadConfig()
+					loadConfig(newGoConfig)
 					lock.Unlock()
 					publishReloadSignal()
 				}
@@ -50,7 +50,7 @@ func loadConfigFile(baseDir string, file string) *goconfig.ConfigFile {
 	return goConfig
 }
 
-func reloadConfigFile(baseDir string, configFilePath string) *goconfig.ConfigFile {
+func reloadConfigFile(configFilePath string) *goconfig.ConfigFile {
 	var err error
 	goConfig, err := goconfig.LoadConfigFile(configFilePath)
 	if err != nil {
@@ -58,7 +58,7 @@ func reloadConfigFile(baseDir string, configFilePath string) *goconfig.ConfigFil
 		return nil
 	}
 
-	if err = loadIncludeFiles(baseDir, goConfig); err != nil {
+	if err = loadIncludeFiles(configFilePath, goConfig); err != nil {
 		log.Println("reload files include files error:", err)
 		return nil
 	}
@@ -66,14 +66,14 @@ func reloadConfigFile(baseDir string, configFilePath string) *goconfig.ConfigFil
 	return goConfig
 }
 
-func loadIncludeFiles(baseDir string, goConfig *goconfig.ConfigFile) error {
+func loadIncludeFiles(baseConfigFile string, goConfig *goconfig.ConfigFile) error {
 	includeFile := goConfig.MustValue("include_path", "path", "")
 	if includeFile != "" {
 		includeFiles := strings.Split(includeFile, ",")
 
 		incFiles := make([]string, len(includeFiles))
 		for i, incFile := range includeFiles {
-			configFilePath := toAbsFile(baseDir, incFile)
+			configFilePath := toAbsConfigFileForAppend(baseConfigFile, incFile)
 			if fileExist(configFilePath) {
 				incFiles[i] = configFilePath
 			}
@@ -82,4 +82,9 @@ func loadIncludeFiles(baseDir string, goConfig *goconfig.ConfigFile) error {
 	}
 
 	return nil
+}
+
+func toAbsConfigFileForAppend(baseConfigFile, includeFile string) string {
+	baseConfigDir := filepath.Dir(baseConfigFile)
+	return toAbsFile(baseConfigDir, includeFile)
 }

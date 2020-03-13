@@ -7,11 +7,16 @@ import (
 
 //项目中封装的GO，带有panic的 recover
 func Go(goroutine func()) {
-	GoWithRecover(goroutine)
+	goWithRecover(goroutine)
 }
 
 //项目中封装的GO，带有panic的 recover
-func GoWithRecover(goroutine func()) {
+func GoWithArgs(goroutine func(args ...interface{}), args ...interface{}) {
+	Go(func() { goroutine(args...) })
+}
+
+//项目中封装的GO，带有panic的 recover
+func goWithRecover(goroutine func()) {
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {

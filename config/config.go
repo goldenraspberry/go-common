@@ -30,13 +30,13 @@ type Config struct {
 }
 
 var (
-	config Config
+	cfg Config
 
 	mapDefaultConfig = map[string]string{
 		"env":        "release",
 		"listen":     ":8080",
-		"cache_dir":  "./cache",
-		"tmp_dir":    "./tmp",
+		"cache_dir":  "/tmp/cache",
+		"tmp_dir":    "/tmp",
 		"log_dir":    "./logs",
 		"log_level":  "INFO",
 		"log":        "app.log",
@@ -47,18 +47,18 @@ var (
 )
 
 func GetListen() string {
-	return config.listen
+	return cfg.listen
 }
 
 func GetEnv() string {
-	return config.env
+	return cfg.env
 }
 
 func GetConfig(section string) map[string]string {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	v, _ := config.config.GetSection(section)
+	v, _ := cfg.config.GetSection(section)
 	if v == nil {
 		return map[string]string{}
 	}
@@ -68,49 +68,49 @@ func GetConfig(section string) map[string]string {
 func GetCacheDir() string {
 	lock.RLock()
 	defer lock.RUnlock()
-	return config.cacheDir
+	return cfg.cacheDir
 }
 
 func GetTmpDir() string {
 	lock.RLock()
 	defer lock.RUnlock()
-	return config.tmpDir
+	return cfg.tmpDir
 }
 
 func GetLogDir() string {
 	lock.RLock()
 	defer lock.RUnlock()
-	return config.logDir
+	return cfg.logDir
 }
 
 func GetLogPath() string {
 	lock.RLock()
 	defer lock.RUnlock()
-	return config.logPath
+	return cfg.logPath
 }
 
 func GetAccessLogPath() string {
 	lock.RLock()
 	defer lock.RUnlock()
-	return config.accessLogPath
+	return cfg.accessLogPath
 }
 
 func GetErrorLogPath() string {
 	lock.RLock()
 	defer lock.RUnlock()
-	return config.errorLogPath
+	return cfg.errorLogPath
 }
 
 func GetSlowLogPath() string {
 	lock.RLock()
 	defer lock.RUnlock()
-	return config.slowLogPath
+	return cfg.slowLogPath
 }
 
 func GetLogLevel() string {
 	lock.RLock()
 	defer lock.RUnlock()
-	return config.logLevel
+	return cfg.logLevel
 }
 
 func initConfig() {
@@ -126,13 +126,11 @@ func initConfig() {
 
 	goConfig := loadConfigFile(baseDir, configFile)
 
-	config.config = goConfig
-
-	loadConfig()
+	loadConfig(goConfig)
 }
 
-func loadConfig() {
-	goConfig := config.config
+func loadConfig(goConfig *goconfig.ConfigFile) {
+	cfg.config = goConfig
 
 	global, _ := goConfig.GetSection("global")
 
@@ -163,17 +161,17 @@ func loadConfig() {
 	}
 
 	baseDir := envBaseDir()
-	config.env = mapGlobal["env"]
-	config.listen = mapGlobal["listen"]
-	config.cacheDir = toAbsFile(baseDir, mapGlobal["cache_dir"])
-	config.tmpDir = toAbsFile(baseDir, mapGlobal["tmp_dir"])
-	config.logDir = toAbsFile(baseDir, mapGlobal["log_dir"])
-	config.logLevel = mapGlobal["log_level"]
+	cfg.env = mapGlobal["env"]
+	cfg.listen = mapGlobal["listen"]
+	cfg.cacheDir = toAbsFile(baseDir, mapGlobal["cache_dir"])
+	cfg.tmpDir = toAbsFile(baseDir, mapGlobal["tmp_dir"])
+	cfg.logDir = toAbsFile(baseDir, mapGlobal["log_dir"])
+	cfg.logLevel = mapGlobal["log_level"]
 
-	config.logPath = getLogFile(config.logDir, mapGlobal["log"])
-	config.accessLogPath = getLogFile(config.logDir, mapGlobal["access_log"])
-	config.errorLogPath = getLogFile(config.logDir, mapGlobal["error_log"])
-	config.slowLogPath = getLogFile(config.logDir, mapGlobal["slow_log"])
+	cfg.logPath = getLogFile(cfg.logDir, mapGlobal["log"])
+	cfg.accessLogPath = getLogFile(cfg.logDir, mapGlobal["access_log"])
+	cfg.errorLogPath = getLogFile(cfg.logDir, mapGlobal["error_log"])
+	cfg.slowLogPath = getLogFile(cfg.logDir, mapGlobal["slow_log"])
 }
 
 func getLogFile(baseDir, filePath string) string {

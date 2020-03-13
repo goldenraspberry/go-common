@@ -63,8 +63,8 @@ func initEnv() {
 	listen := flag.String("listen", "", "web server [ip]:port, default :8080")
 	configFile := flag.String("config-file", "", "app base config, default env.ini")
 	baseDir := flag.String("base-dir", defaultBaseDir, "app base dir")
-	tmpDir := flag.String("tmp-dir", "", "app tmp dir, default tmp")
-	cacheDir := flag.String("cache-dir", "", "app base dir, default cache")
+	tmpDir := flag.String("tmp-dir", "", "app tmp dir, default /tmp")
+	cacheDir := flag.String("cache-dir", "", "app base dir, default /tmp/cache")
 	logDir := flag.String("log-dir", "", "app base dir, default, log")
 
 	flag.Parse()

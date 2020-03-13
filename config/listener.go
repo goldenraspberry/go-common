@@ -24,9 +24,8 @@ func AddReloadListener(listener ReloadListener) {
 
 	utils.Go(func() {
 		for range c {
-			listener()
+			utils.Go(listener)
 		}
-		close(c)
 	})
 
 	RegisterListenerChannel(c)

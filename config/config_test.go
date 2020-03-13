@@ -26,4 +26,10 @@ func TestConfig(t *testing.T) {
 	assert.Equal(t, GetSlowLogPath(), DISABLE, "get slow_log_path failure")
 	assert.Equal(t, GetLogLevel(), "debug", "get log_level failure")
 
+	d := GetConfig("t")
+	s := ""
+	if _, ok := d["abc"]; ok {
+		s = d["abc"]
+	}
+	assert.Equal(t, s, "1", "get t/abc failure")
 }
