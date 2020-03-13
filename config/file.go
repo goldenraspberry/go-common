@@ -15,15 +15,18 @@ func toAbsFile(baseDir string, filePath string) string {
 		return filePath
 	}
 
-	realPath := filepath.Join(baseDir, filePath)
-	if fileExist(realPath) {
-		return realPath
+	realPath1 := filepath.Join(baseDir, filePath)
+	if fileExist(realPath1) {
+		return realPath1
 	}
 
-	realPath, err := filepath.Abs(filePath)
+	realPath2, err := filepath.Abs(filePath)
 	if err != nil {
 		panic(err)
 	}
+	if fileExist(realPath2) {
+		return realPath2
+	}
 
-	return realPath
+	return realPath1
 }

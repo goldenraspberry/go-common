@@ -19,7 +19,7 @@ type Env struct {
 }
 
 var (
-	env *Env
+	env = &Env{}
 )
 
 func envEnv() string {

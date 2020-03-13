@@ -1,6 +1,8 @@
 package config
 
 import (
+	"strings"
+
 	"github.com/Unknwon/goconfig"
 )
 
@@ -28,7 +30,7 @@ type Config struct {
 }
 
 var (
-	config *Config
+	config Config
 
 	mapDefaultConfig = map[string]string{
 		"env":        "release",
@@ -113,9 +115,7 @@ func GetLogLevel() string {
 
 func initConfig() {
 	lock.Lock()
-	lock.Unlock()
-
-	config := &Config{}
+	defer lock.Unlock()
 
 	baseDir := envBaseDir()
 	configFile := envConfigFile()
@@ -168,10 +168,23 @@ func loadConfig() {
 	config.cacheDir = toAbsFile(baseDir, mapGlobal["cache_dir"])
 	config.tmpDir = toAbsFile(baseDir, mapGlobal["tmp_dir"])
 	config.logDir = toAbsFile(baseDir, mapGlobal["log_dir"])
-	config.logLevel = toAbsFile(baseDir, mapGlobal["log_level"])
+	config.logLevel = mapGlobal["log_level"]
 
-	config.logPath = toAbsFile(config.logDir, mapGlobal["log"])
-	config.accessLogPath = toAbsFile(config.logDir, mapGlobal["access_log"])
-	config.errorLogPath = toAbsFile(config.logDir, mapGlobal["error_log"])
-	config.slowLogPath = toAbsFile(config.logDir, mapGlobal["slow_log"])
+	config.logPath = getLogFile(config.logDir, mapGlobal["log"])
+	config.accessLogPath = getLogFile(config.logDir, mapGlobal["access_log"])
+	config.errorLogPath = getLogFile(config.logDir, mapGlobal["error_log"])
+	config.slowLogPath = getLogFile(config.logDir, mapGlobal["slow_log"])
+}
+
+func getLogFile(baseDir, filePath string) string {
+	lowerFilePath := strings.ToLower(filePath)
+	switch lowerFilePath {
+	case DISABLE:
+		fallthrough
+	case STDERR:
+		fallthrough
+	case STDOUT:
+		return lowerFilePath
+	}
+	return toAbsFile(baseDir, filePath)
 }

@@ -15,7 +15,7 @@ import (
 func loadConfigFile(baseDir string, file string) *goconfig.ConfigFile {
 	configFilePath := toAbsFile(baseDir, file)
 
-	if fileExist(configFilePath) {
+	if !fileExist(configFilePath) {
 		panic(fmt.Sprintf("config file %s not exists", configFilePath))
 	}
 
