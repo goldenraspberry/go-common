@@ -1,27 +1,37 @@
 package config
 
-import "sync"
+import (
+	"github.com/dustin/go-broadcast"
+	"github.com/goldenraspberry/go-common/utils"
+)
 
 type ReloadListener func()
 
+const (
+	ConfigReloadSignal = 1
+)
+
 var (
-	listListener []ReloadListener
-	listenerLock sync.Mutex
+	bcService = broadcast.NewBroadcaster(10)
 )
 
 func publishReloadSignal() {
-	listenerLock.Lock()
-	listenerLock.Unlock()
-	if len(listListener) == 0 {
-		return
-	}
-	for _, listener := range listListener {
-		listener()
-	}
+	bcService.Submit(ConfigReloadSignal)
 }
 
 func AddReloadListener(listener ReloadListener) {
-	listenerLock.Lock()
-	listListener = append(listListener, listener)
-	listenerLock.Unlock()
+	c := make(chan interface{}, 5)
+
+	utils.Go(func() {
+		for range c {
+			listener()
+		}
+		close(c)
+	})
+
+	RegisterListenerChannel(c)
+}
+
+func RegisterListenerChannel(c chan interface{}) {
+	bcService.Register(c)
 }
