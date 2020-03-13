@@ -61,21 +61,21 @@ func initEnv() {
 
 	appEnv := flag.String("env", "", "app env, default release")
 	listen := flag.String("listen", "", "web server [ip]:port, default :8080")
-	configFile := flag.String("config_file", "", "app base config, default env.ini")
-	baseDir := flag.String("base_dir", defaultBaseDir, "app base dir")
-	tmpDir := flag.String("tmp_dir", "", "app tmp dir, default tmp")
-	cacheDir := flag.String("cache_dir", "", "app base dir, default cache")
-	logDir := flag.String("log_dir", "", "app base dir, default, log")
+	configFile := flag.String("config-file", "", "app base config, default env.ini")
+	baseDir := flag.String("base-dir", defaultBaseDir, "app base dir")
+	tmpDir := flag.String("tmp-dir", "", "app tmp dir, default tmp")
+	cacheDir := flag.String("cache-dir", "", "app base dir, default cache")
+	logDir := flag.String("log-dir", "", "app base dir, default, log")
 
 	flag.Parse()
 
 	e.env = *appEnv
 	e.listen = *listen
 	e.baseDir = *baseDir
-	e.tmpDir = *tmpDir
-	e.cacheDir = *cacheDir
-	e.logDir = *logDir
-	e.configFile = *configFile
+	e.tmpDir = getRelPathForEnv(*tmpDir)
+	e.cacheDir = getRelPathForEnv(*cacheDir)
+	e.logDir = getRelPathForEnv(*logDir)
+	e.configFile = getRelPathForEnv(*configFile)
 
 	env = e
 }
@@ -106,4 +106,21 @@ func getDefaultBasePath() string {
 	}
 
 	return basePath
+}
+
+func getRelPathForEnv(filePath string) string {
+	if filePath == "" {
+		return ""
+	}
+
+	if filepath.IsAbs(filePath) {
+		return filePath
+	}
+
+	realPath, err := filepath.Abs(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	return realPath
 }

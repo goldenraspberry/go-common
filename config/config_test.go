@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// go test -config-file=env.ini
 func TestConfig(t *testing.T) {
 	wd, _ := exec.LookPath(os.Args[0])
 	baseDir := filepath.Dir(wd)
