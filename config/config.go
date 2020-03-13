@@ -40,9 +40,9 @@ var (
 		"log_dir":    "./logs",
 		"log_level":  "INFO",
 		"log":        "app.log",
-		"access_log": "access.log",
-		"error_log":  "error.log",
-		"slow_log":   "slow.log",
+		"access_log": STDOUT,
+		"error_log":  STDERR,
+		"slow_log":   DISABLE,
 	}
 )
 
