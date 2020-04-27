@@ -13,6 +13,6 @@ func Logf(level string, category string, ctx context.Context, format string, v .
 	Log(level, category, ctx, fmt.Sprintf(format, v...))
 }
 
-func Log(level string,category string, ctx context.Context, format string) {
+func Log(level string,category string, ctx context.Context, msg string) {
 	// dolog
 }
