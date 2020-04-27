@@ -9,10 +9,10 @@ type Logger interface{}
 
 type log interface{}
 
-func Logf(level string, ctx context.Context, format string, v ...interface{}) {
-	Log(level, ctx, fmt.Sprintf(format, v...))
+func Logf(level string, category string, ctx context.Context, format string, v ...interface{}) {
+	Log(level, category, ctx, fmt.Sprintf(format, v...))
 }
 
-func Log(level string, ctx context.Context, format string) {
-
+func Log(level string,category string, ctx context.Context, format string) {
+	// dolog
 }
